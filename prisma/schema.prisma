@@ -1,0 +1,87 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// SQLite has no native enum support in Prisma, so these fields are plain
+// strings constrained by TypeScript union types in src/lib/types.ts:
+// Visibility: "PUBLIC" | "PRIVATE"
+// Role:       "OWNER" | "MEMBER"
+// ItemType:   "BOOK" | "MOVIE"
+// AgeSection: "KIDS" | "TEEN" | "ADULT"
+
+model User {
+  id          String   @id @default(cuid())
+  name        String
+  avatarEmoji String   @default("🙂")
+  loginToken  String   @unique @default(cuid())
+  createdAt   DateTime @default(now())
+
+  memberships  Membership[]
+  reviews      Review[]
+  itemsAdded   Item[]
+  ownedBubbles Bubble[]     @relation("BubbleOwner")
+}
+
+model Bubble {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  visibility  String   @default("PRIVATE")
+  inviteCode  String   @unique
+  ownerId     String
+  createdAt   DateTime @default(now())
+
+  owner       User         @relation("BubbleOwner", fields: [ownerId], references: [id])
+  memberships Membership[]
+  reviews     Review[]
+}
+
+model Membership {
+  id       String   @id @default(cuid())
+  userId   String
+  bubbleId String
+  role     String   @default("MEMBER")
+  joinedAt DateTime @default(now())
+
+  user   User   @relation(fields: [userId], references: [id])
+  bubble Bubble @relation(fields: [bubbleId], references: [id])
+
+  @@unique([userId, bubbleId])
+}
+
+model Item {
+  id          String   @id @default(cuid())
+  type        String
+  title       String
+  creator     String?
+  genre       String
+  ageSection  String   @default("ADULT")
+  description String?
+  coverUrl    String?
+  addedById   String
+  createdAt   DateTime @default(now())
+
+  addedBy User     @relation(fields: [addedById], references: [id])
+  reviews Review[]
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  itemId    String
+  userId    String
+  bubbleId  String
+  rating    Int
+  text      String?
+  createdAt DateTime @default(now())
+
+  item   Item   @relation(fields: [itemId], references: [id])
+  user   User   @relation(fields: [userId], references: [id])
+  bubble Bubble @relation(fields: [bubbleId], references: [id])
+
+  @@unique([itemId, userId, bubbleId])
+}
