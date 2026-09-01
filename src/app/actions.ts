@@ -130,6 +130,35 @@ export async function addReviewAction(formData: FormData) {
   revalidatePath(`/item/${itemId}`);
 }
 
+export async function updateItemAction(formData: FormData) {
+  const user = await requireUser();
+  const itemId = str(formData, "itemId");
+
+  const item = await prisma.item.findUnique({ where: { id: itemId } });
+  if (!item) throw new Error("This item no longer exists.");
+  if (item.addedById !== user.id) {
+    throw new Error("Only the person who added this can edit its details.");
+  }
+
+  const title = str(formData, "title");
+  const creator = str(formData, "creator") || null;
+  const genre = str(formData, "genre") || item.genre;
+  const ageSection = ["KIDS", "TEEN", "ADULT"].includes(str(formData, "ageSection"))
+    ? str(formData, "ageSection")
+    : item.ageSection;
+  const description = str(formData, "description") || null;
+  const coverUrl = str(formData, "coverUrl") || null;
+
+  if (!title) throw new Error("A title is required.");
+
+  await prisma.item.update({
+    where: { id: itemId },
+    data: { title, creator, genre, ageSection, description, coverUrl },
+  });
+
+  revalidatePath(`/item/${itemId}`);
+}
+
 export async function updateProfileAction(formData: FormData) {
   const user = await requireUser();
   const name = str(formData, "name");

@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { Stars } from "@/components/Stars";
 import { ReviewForm } from "@/components/ReviewForm";
+import { EditItemForm } from "@/components/EditItemForm";
 import { ageSectionEmoji, ageSectionLabel, ageSectionBadgeClass } from "@/lib/types";
 
 export default async function ItemPage({
@@ -96,6 +97,19 @@ export default async function ItemPage({
             </span>
           </div>
           {item.description && <p className="mt-3 text-sm text-stone-700">{item.description}</p>}
+
+          {user && item.addedById === user.id && (
+            <EditItemForm
+              itemId={item.id}
+              type={item.type as "BOOK" | "MOVIE"}
+              title={item.title}
+              creator={item.creator}
+              genre={item.genre}
+              ageSection={item.ageSection}
+              description={item.description}
+              coverUrl={item.coverUrl}
+            />
+          )}
         </div>
       </div>
 
