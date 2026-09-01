@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
-import { addRecommendationAction } from "../../../actions";
 import { AddItemForm } from "@/components/AddItemForm";
 
 export default async function AddItemPage({ params }: { params: Promise<{ id: string }> }) {
@@ -28,8 +27,6 @@ export default async function AddItemPage({ params }: { params: Promise<{ id: st
     );
   }
 
-  const action = addRecommendationAction.bind(null, bubble.id);
-
   return (
     <div className="mx-auto max-w-lg px-4 py-10">
       <h1 className="text-2xl font-bold">Add to {bubble.name}</h1>
@@ -37,7 +34,7 @@ export default async function AddItemPage({ params }: { params: Promise<{ id: st
         Share a book or movie and tell your bubble what you thought.
       </p>
       <div className="mt-6">
-        <AddItemForm action={action} />
+        <AddItemForm bubbleId={bubble.id} />
       </div>
     </div>
   );

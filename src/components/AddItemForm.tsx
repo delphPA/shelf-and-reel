@@ -2,13 +2,15 @@
 
 import { useState } from "react";
 import { BOOK_GENRES, MOVIE_GENRES, AGE_SECTIONS } from "@/lib/types";
+import { addRecommendationAction } from "@/app/actions";
 
-export function AddItemForm({ action }: { action: (formData: FormData) => void }) {
+export function AddItemForm({ bubbleId }: { bubbleId: string }) {
   const [type, setType] = useState<"BOOK" | "MOVIE">("BOOK");
   const genres = type === "BOOK" ? BOOK_GENRES : MOVIE_GENRES;
 
   return (
-    <form action={action} className="space-y-5">
+    <form action={addRecommendationAction} className="space-y-5">
+      <input type="hidden" name="bubbleId" value={bubbleId} />
       <fieldset>
         <legend className="mb-1 text-sm font-medium text-neutral-700">What are you sharing?</legend>
         <div className="flex gap-3">

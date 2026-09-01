@@ -24,8 +24,6 @@ export default async function JoinPage({
       })
     : null;
 
-  const joinWithCode = joinBubbleAction.bind(null, code);
-
   return (
     <div className="mx-auto max-w-lg px-4 py-10">
       <p className="text-sm text-neutral-500">You&rsquo;ve been invited to join</p>
@@ -40,7 +38,8 @@ export default async function JoinPage({
           </a>
         </div>
       ) : (
-        <form action={joinWithCode} className="mt-6 space-y-5">
+        <form action={joinBubbleAction} className="mt-6 space-y-5">
+          <input type="hidden" name="inviteCode" value={code} />
           {user ? (
             <p className="text-sm text-neutral-600">
               Joining as <strong>{user.name}</strong> {user.avatarEmoji}

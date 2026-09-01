@@ -1,19 +1,24 @@
 "use client";
 
 import { useState } from "react";
+import { addReviewAction } from "@/app/actions";
 
 export function ReviewForm({
-  action,
+  itemId,
+  bubbleId,
   defaultRating = 5,
   defaultText = "",
 }: {
-  action: (formData: FormData) => void;
+  itemId: string;
+  bubbleId: string;
   defaultRating?: number;
   defaultText?: string;
 }) {
   const [rating, setRating] = useState(defaultRating);
   return (
-    <form action={action} className="space-y-3">
+    <form action={addReviewAction} className="space-y-3">
+      <input type="hidden" name="itemId" value={itemId} />
+      <input type="hidden" name="bubbleId" value={bubbleId} />
       <input type="hidden" name="rating" value={rating} />
       <div className="flex gap-1 text-2xl">
         {[1, 2, 3, 4, 5].map((n) => (

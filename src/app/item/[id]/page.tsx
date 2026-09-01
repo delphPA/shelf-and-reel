@@ -5,7 +5,6 @@ import { getCurrentUser } from "@/lib/auth";
 import { Stars } from "@/components/Stars";
 import { ReviewForm } from "@/components/ReviewForm";
 import { ageSectionEmoji, ageSectionLabel } from "@/lib/types";
-import { addReviewAction } from "../../actions";
 
 export default async function ItemPage({
   params,
@@ -106,7 +105,8 @@ export default async function ItemPage({
             {myReviewInContext ? "Update your review" : "Add your review"} in {contextBubble.name}
           </h2>
           <ReviewForm
-            action={addReviewAction.bind(null, item.id, contextBubble.id)}
+            itemId={item.id}
+            bubbleId={contextBubble.id}
             defaultRating={myReviewInContext?.rating ?? 5}
             defaultText={myReviewInContext?.text ?? ""}
           />

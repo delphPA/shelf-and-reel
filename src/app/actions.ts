@@ -50,7 +50,8 @@ export async function createBubbleAction(formData: FormData) {
   redirect(`/bubble/${bubble.id}`);
 }
 
-export async function joinBubbleAction(inviteCode: string, formData: FormData) {
+export async function joinBubbleAction(formData: FormData) {
+  const inviteCode = str(formData, "inviteCode");
   const bubble = await prisma.bubble.findUnique({ where: { inviteCode } });
   if (!bubble) throw new Error("That invite link doesn't seem to be valid anymore.");
 
@@ -65,8 +66,9 @@ export async function joinBubbleAction(inviteCode: string, formData: FormData) {
   redirect(`/bubble/${bubble.id}`);
 }
 
-export async function addRecommendationAction(bubbleId: string, formData: FormData) {
+export async function addRecommendationAction(formData: FormData) {
   const user = await requireUser();
+  const bubbleId = str(formData, "bubbleId");
 
   const membership = await prisma.membership.findUnique({
     where: { userId_bubbleId: { userId: user.id, bubbleId } },
@@ -106,8 +108,10 @@ export async function addRecommendationAction(bubbleId: string, formData: FormDa
   redirect(`/item/${item.id}?bubble=${bubbleId}`);
 }
 
-export async function addReviewAction(itemId: string, bubbleId: string, formData: FormData) {
+export async function addReviewAction(formData: FormData) {
   const user = await requireUser();
+  const itemId = str(formData, "itemId");
+  const bubbleId = str(formData, "bubbleId");
 
   const membership = await prisma.membership.findUnique({
     where: { userId_bubbleId: { userId: user.id, bubbleId } },
