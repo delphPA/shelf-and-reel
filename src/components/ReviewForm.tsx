@@ -26,7 +26,7 @@ export function ReviewForm({
             type="button"
             key={n}
             onClick={() => setRating(n)}
-            className={n <= rating ? "text-amber-500" : "text-neutral-300"}
+            className={n <= rating ? "text-amber-500" : "text-stone-300"}
             aria-label={`${n} star${n === 1 ? "" : "s"}`}
           >
             ★
@@ -39,11 +39,11 @@ export function ReviewForm({
         rows={3}
         maxLength={1000}
         placeholder="What did you think?"
-        className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+        className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
       />
       <button
         type="submit"
-        className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+        className="rounded-md bg-amber-800 px-4 py-2 text-sm font-medium text-white hover:bg-amber-900"
       >
         Save review
       </button>

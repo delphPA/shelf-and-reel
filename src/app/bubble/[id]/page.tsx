@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { Stars } from "@/components/Stars";
 import { InviteBox } from "@/components/InviteBox";
-import { AGE_SECTIONS, ageSectionEmoji } from "@/lib/types";
+import { AGE_SECTIONS, ageSectionEmoji, ageSectionBadgeClass } from "@/lib/types";
 import type { Prisma } from "@prisma/client";
 
 export default async function BubblePage({
@@ -35,7 +35,7 @@ export default async function BubblePage({
     return (
       <div className="mx-auto max-w-lg px-4 py-16 text-center">
         <h1 className="text-xl font-semibold">This bubble is private</h1>
-        <p className="mt-2 text-sm text-neutral-600">
+        <p className="mt-2 text-sm text-stone-600">
           Ask {bubble.owner.name} for an invite link to see what&rsquo;s inside.
         </p>
       </div>
@@ -76,16 +76,22 @@ export default async function BubblePage({
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-2xl font-bold">{bubble.name}</h1>
-            <span className="rounded-full bg-neutral-100 px-2 py-0.5 text-xs text-neutral-500">
+            <span
+              className={`rounded-full px-2 py-0.5 text-xs ${
+                bubble.visibility === "PUBLIC"
+                  ? "bg-emerald-100 text-emerald-800"
+                  : "bg-stone-100 text-stone-600"
+              }`}
+            >
               {bubble.visibility === "PUBLIC" ? "Public" : "Private"}
             </span>
           </div>
-          {bubble.description && <p className="mt-1 text-neutral-600">{bubble.description}</p>}
+          {bubble.description && <p className="mt-1 text-stone-600">{bubble.description}</p>}
         </div>
         {isMember && (
           <Link
             href={`/bubble/${bubble.id}/add`}
-            className="shrink-0 rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white hover:bg-neutral-700"
+            className="shrink-0 rounded-md bg-amber-800 px-4 py-2 text-sm font-medium text-white hover:bg-amber-900"
           >
             + Add a recommendation
           </Link>
@@ -94,18 +100,18 @@ export default async function BubblePage({
 
       {isMember && <InviteBox inviteCode={bubble.inviteCode} />}
 
-      <form className="mt-6 flex flex-wrap items-end gap-3 rounded-lg border border-neutral-200 bg-white p-3">
+      <form className="mt-6 flex flex-wrap items-end gap-3 rounded-lg border border-stone-200 bg-white p-3">
         <div>
-          <label className="mb-1 block text-xs font-medium text-neutral-500">Type</label>
-          <select name="type" defaultValue={sp.type ?? ""} className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm">
+          <label className="mb-1 block text-xs font-medium text-stone-500">Type</label>
+          <select name="type" defaultValue={sp.type ?? ""} className="rounded-md border border-stone-300 px-2 py-1.5 text-sm">
             <option value="">All</option>
             <option value="BOOK">Books</option>
             <option value="MOVIE">Movies</option>
           </select>
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-neutral-500">Section</label>
-          <select name="age" defaultValue={sp.age ?? ""} className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm">
+          <label className="mb-1 block text-xs font-medium text-stone-500">Section</label>
+          <select name="age" defaultValue={sp.age ?? ""} className="rounded-md border border-stone-300 px-2 py-1.5 text-sm">
             <option value="">All ages</option>
             {AGE_SECTIONS.map((s) => (
               <option key={s.value} value={s.value}>
@@ -115,8 +121,8 @@ export default async function BubblePage({
           </select>
         </div>
         <div>
-          <label className="mb-1 block text-xs font-medium text-neutral-500">Genre</label>
-          <select name="genre" defaultValue={sp.genre ?? ""} className="rounded-md border border-neutral-300 px-2 py-1.5 text-sm">
+          <label className="mb-1 block text-xs font-medium text-stone-500">Genre</label>
+          <select name="genre" defaultValue={sp.genre ?? ""} className="rounded-md border border-stone-300 px-2 py-1.5 text-sm">
             <option value="">All genres</option>
             {genres.map((g) => (
               <option key={g} value={g}>
@@ -125,11 +131,11 @@ export default async function BubblePage({
             ))}
           </select>
         </div>
-        <button type="submit" className="rounded-md border border-neutral-300 px-3 py-1.5 text-sm hover:bg-neutral-50">
+        <button type="submit" className="rounded-md border border-stone-300 px-3 py-1.5 text-sm hover:bg-stone-50">
           Filter
         </button>
         {(sp.type || sp.age || sp.genre) && (
-          <Link href={`/bubble/${bubble.id}`} className="text-sm text-neutral-500 underline">
+          <Link href={`/bubble/${bubble.id}`} className="text-sm text-stone-500 underline">
             Clear
           </Link>
         )}
@@ -137,7 +143,7 @@ export default async function BubblePage({
 
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {items.length === 0 && (
-          <p className="text-sm text-neutral-500">Nothing here yet — be the first to add one!</p>
+          <p className="text-sm text-stone-500">Nothing here yet — be the first to add one!</p>
         )}
         {items.map((item) => {
           const avg =
@@ -146,9 +152,9 @@ export default async function BubblePage({
             <Link
               key={item.id}
               href={`/item/${item.id}?bubble=${bubble.id}`}
-              className="flex gap-3 rounded-lg border border-neutral-200 bg-white p-3 hover:shadow-md transition-shadow"
+              className="flex gap-3 rounded-lg border border-stone-200 bg-white p-3 hover:shadow-md transition-shadow"
             >
-              <div className="flex h-20 w-14 shrink-0 items-center justify-center rounded bg-neutral-100 text-2xl overflow-hidden">
+              <div className="flex h-20 w-14 shrink-0 items-center justify-center rounded bg-stone-100 text-2xl overflow-hidden">
                 {item.coverUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
                   <img src={item.coverUrl} alt="" className="h-full w-full object-cover" />
@@ -160,14 +166,16 @@ export default async function BubblePage({
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{item.title}</p>
-                {item.creator && <p className="truncate text-xs text-neutral-500">{item.creator}</p>}
-                <div className="mt-1 flex items-center gap-1.5 text-xs text-neutral-500">
-                  <span>{ageSectionEmoji(item.ageSection)}</span>
-                  <span>{item.genre}</span>
+                {item.creator && <p className="truncate text-xs text-stone-500">{item.creator}</p>}
+                <div className="mt-1 flex items-center gap-1.5 text-xs">
+                  <span className={`rounded-full px-1.5 py-0.5 ${ageSectionBadgeClass(item.ageSection)}`}>
+                    {ageSectionEmoji(item.ageSection)}
+                  </span>
+                  <span className="text-stone-500">{item.genre}</span>
                 </div>
                 <div className="mt-1 flex items-center gap-1.5">
                   <Stars rating={avg} size="text-sm" />
-                  <span className="text-xs text-neutral-400">({item.reviews.length})</span>
+                  <span className="text-xs text-stone-400">({item.reviews.length})</span>
                 </div>
               </div>
             </Link>

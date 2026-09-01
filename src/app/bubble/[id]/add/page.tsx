@@ -19,7 +19,7 @@ export default async function AddItemPage({ params }: { params: Promise<{ id: st
     return (
       <div className="mx-auto max-w-lg px-4 py-16 text-center">
         <h1 className="text-xl font-semibold">Join {bubble.name} first</h1>
-        <p className="mt-2 text-sm text-neutral-600">
+        <p className="mt-2 text-sm text-stone-600">
           You need to be a member of this bubble to add a recommendation. Ask a member for the
           invite link.
         </p>
@@ -30,7 +30,7 @@ export default async function AddItemPage({ params }: { params: Promise<{ id: st
   return (
     <div className="mx-auto max-w-lg px-4 py-10">
       <h1 className="text-2xl font-bold">Add to {bubble.name}</h1>
-      <p className="mt-1 text-sm text-neutral-600">
+      <p className="mt-1 text-sm text-stone-600">
         Share a book or movie and tell your bubble what you thought.
       </p>
       <div className="mt-6">

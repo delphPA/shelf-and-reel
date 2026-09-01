@@ -28,12 +28,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col bg-[#faf7f2] text-neutral-900">
-        <header className="border-b border-neutral-200 bg-white">
+      <body className="min-h-full flex flex-col bg-[#faf3e8] text-stone-900">
+        <header className="border-b-2 border-amber-800/20 bg-white">
           <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-            <Link href="/" className="flex items-center gap-2 font-semibold text-lg">
+            <Link href="/" className="flex items-center gap-2 text-lg font-bold text-stone-900">
               <span aria-hidden>📚🎬</span>
-              <span>Shelf &amp; Reel</span>
+              <span>
+                Shelf <span className="text-amber-800">&amp;</span> Reel
+              </span>
             </Link>
             <nav className="flex items-center gap-4 text-sm">
               {user ? (
@@ -43,13 +45,13 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                     <span>{user.name}</span>
                   </Link>
                   <form action={logoutAction}>
-                    <button type="submit" className="text-neutral-500 hover:text-neutral-900 hover:underline">
+                    <button type="submit" className="text-stone-500 hover:text-stone-900 hover:underline">
                       Sign out
                     </button>
                   </form>
                 </>
               ) : (
-                <Link href="/create-bubble" className="rounded-md bg-neutral-900 px-3 py-1.5 text-white hover:bg-neutral-700">
+                <Link href="/create-bubble" className="rounded-md bg-amber-800 px-3 py-1.5 text-white hover:bg-amber-900">
                   Get started
                 </Link>
               )}
@@ -57,7 +59,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           </div>
         </header>
         <main className="flex-1">{children}</main>
-        <footer className="border-t border-neutral-200 py-6 text-center text-xs text-neutral-400">
+        <footer className="border-t border-amber-800/20 py-6 text-center text-xs text-stone-500">
           Shelf &amp; Reel — recommendations from people you trust, not algorithms.
         </footer>
       </body>

@@ -19,24 +19,24 @@ export function InviteBox({ inviteCode }: { inviteCode: string }) {
   }
 
   return (
-    <div className="mt-4 flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-neutral-300 bg-white p-3 text-sm">
-      <span className="text-neutral-600">Invite people to this bubble:</span>
+    <div className="mt-4 flex flex-wrap items-center gap-2 rounded-lg border border-dashed border-stone-300 bg-white p-3 text-sm">
+      <span className="text-stone-600">Invite people to this bubble:</span>
       <button
         type="button"
         onClick={copy}
-        className="rounded-md bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white hover:bg-neutral-700"
+        className="rounded-md bg-amber-800 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-900"
       >
         {copied ? "Copied!" : "Copy invite link"}
       </button>
       <button
         type="button"
         onClick={() => setShow((s) => !s)}
-        className="text-xs text-neutral-500 underline"
+        className="text-xs text-stone-500 underline"
       >
         {show ? "hide" : "show link"}
       </button>
       {show && (
-        <code className="w-full break-all rounded bg-neutral-100 px-2 py-1 text-xs">{link}</code>
+        <code className="w-full break-all rounded bg-stone-100 px-2 py-1 text-xs">{link}</code>
       )}
     </div>
   );

@@ -4,7 +4,7 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { Stars } from "@/components/Stars";
 import { ReviewForm } from "@/components/ReviewForm";
-import { ageSectionEmoji, ageSectionLabel } from "@/lib/types";
+import { ageSectionEmoji, ageSectionLabel, ageSectionBadgeClass } from "@/lib/types";
 
 export default async function ItemPage({
   params,
@@ -60,13 +60,13 @@ export default async function ItemPage({
   return (
     <div className="mx-auto max-w-3xl px-4 py-8">
       {contextBubble && (
-        <Link href={`/bubble/${contextBubble.id}`} className="text-sm text-neutral-500 hover:underline">
+        <Link href={`/bubble/${contextBubble.id}`} className="text-sm text-stone-500 hover:underline">
           ← Back to {contextBubble.name}
         </Link>
       )}
 
       <div className="mt-3 flex gap-5">
-        <div className="flex h-40 w-28 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-neutral-100 text-4xl">
+        <div className="flex h-40 w-28 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-stone-100 text-4xl">
           {item.coverUrl ? (
             // eslint-disable-next-line @next/next/no-img-element
             <img src={item.coverUrl} alt="" className="h-full w-full object-cover" />
@@ -77,30 +77,30 @@ export default async function ItemPage({
           )}
         </div>
         <div>
-          <p className="text-xs uppercase tracking-wide text-neutral-400">
+          <p className="text-xs uppercase tracking-wide text-stone-400">
             {item.type === "BOOK" ? "Book" : "Movie"}
           </p>
           <h1 className="text-2xl font-bold">{item.title}</h1>
-          {item.creator && <p className="text-neutral-600">{item.creator}</p>}
-          <div className="mt-2 flex items-center gap-2 text-sm text-neutral-500">
-            <span>
+          {item.creator && <p className="text-stone-600">{item.creator}</p>}
+          <div className="mt-2 flex items-center gap-2 text-sm">
+            <span className={`rounded-full px-2 py-0.5 text-xs ${ageSectionBadgeClass(item.ageSection)}`}>
               {ageSectionEmoji(item.ageSection)} {ageSectionLabel(item.ageSection)}
             </span>
-            <span>·</span>
-            <span>{item.genre}</span>
+            <span className="text-stone-400">·</span>
+            <span className="text-stone-500">{item.genre}</span>
           </div>
           <div className="mt-2 flex items-center gap-2">
             <Stars rating={avg} size="text-lg" />
-            <span className="text-sm text-neutral-400">
+            <span className="text-sm text-stone-400">
               {visibleReviews.length} review{visibleReviews.length === 1 ? "" : "s"}
             </span>
           </div>
-          {item.description && <p className="mt-3 text-sm text-neutral-700">{item.description}</p>}
+          {item.description && <p className="mt-3 text-sm text-stone-700">{item.description}</p>}
         </div>
       </div>
 
       {contextBubble && user && (
-        <div className="mt-8 rounded-lg border border-neutral-200 bg-white p-4">
+        <div className="mt-8 rounded-lg border border-stone-200 bg-white p-4">
           <h2 className="mb-2 font-semibold">
             {myReviewInContext ? "Update your review" : "Add your review"} in {contextBubble.name}
           </h2>
@@ -116,20 +116,20 @@ export default async function ItemPage({
       <div className="mt-8">
         <h2 className="mb-3 font-semibold">Reviews</h2>
         {visibleReviews.length === 0 && (
-          <p className="text-sm text-neutral-500">No reviews visible to you yet.</p>
+          <p className="text-sm text-stone-500">No reviews visible to you yet.</p>
         )}
         <ul className="space-y-4">
           {visibleReviews.map((r) => (
-            <li key={r.id} className="rounded-lg border border-neutral-200 bg-white p-4">
+            <li key={r.id} className="rounded-lg border border-stone-200 bg-white p-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <span>{r.user.avatarEmoji}</span>
                   <span className="font-medium">{r.user.name}</span>
-                  <span className="text-xs text-neutral-400">in {r.bubble.name}</span>
+                  <span className="text-xs text-stone-400">in {r.bubble.name}</span>
                 </div>
                 <Stars rating={r.rating} />
               </div>
-              {r.text && <p className="mt-2 text-sm text-neutral-700">{r.text}</p>}
+              {r.text && <p className="mt-2 text-sm text-stone-700">{r.text}</p>}
             </li>
           ))}
         </ul>
