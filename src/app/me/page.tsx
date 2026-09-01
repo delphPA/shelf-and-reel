@@ -77,10 +77,14 @@ export default async function ProfilePage() {
               <li key={m.bubble.id}>
                 <Link
                   href={`/bubble/${m.bubble.id}`}
-                  className="flex items-center justify-between rounded-lg border border-stone-200 bg-white p-3 hover:shadow-sm"
+                  className="flex items-center gap-3 rounded-[1.5rem] border border-white bg-white/90 p-3 shadow-[0_6px_16px_-10px_rgba(90,56,27,0.5)] hover:shadow-[0_10px_20px_-10px_rgba(90,56,27,0.6)]"
                 >
-                  <span>{m.bubble.name}</span>
-                  <span className="text-xs text-stone-400">{m.role === "OWNER" ? "Owner" : "Member"}</span>
+                  <span className="relative flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-sky-200 via-violet-200 to-rose-200 text-sm font-bold text-stone-700">
+                    <span className="absolute left-1.5 top-1 h-2 w-2 rounded-full bg-white/70 blur-[1px]" />
+                    {m.bubble.name.trim().charAt(0).toUpperCase() || "?"}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate">{m.bubble.name}</span>
+                  <span className="shrink-0 text-xs text-stone-400">{m.role === "OWNER" ? "Owner" : "Member"}</span>
                 </Link>
               </li>
             ))}

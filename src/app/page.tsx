@@ -94,25 +94,32 @@ export default async function HomePage() {
 }
 
 function BubbleCard({ bubble }: { bubble: BubbleSummary }) {
+  const initial = bubble.name.trim().charAt(0).toUpperCase() || "?";
   return (
     <Link
       href={`/bubble/${bubble.id}`}
-      className="block rounded-lg border border-stone-200 bg-white p-4 transition-shadow hover:shadow-md"
+      className="group block rounded-[2rem] border border-white bg-white/90 p-5 shadow-[0_10px_22px_-12px_rgba(90,56,27,0.5)] transition-all hover:-translate-y-1 hover:shadow-[0_16px_30px_-12px_rgba(90,56,27,0.6)]"
     >
-      <div className="flex items-center justify-between gap-2">
-        <h3 className="font-semibold text-stone-900">{bubble.name}</h3>
-        <span
-          className={`shrink-0 rounded-full px-2 py-0.5 text-xs ${
-            bubble.visibility === "PUBLIC"
-              ? "bg-emerald-100 text-emerald-800"
-              : "bg-stone-100 text-stone-600"
-          }`}
-        >
-          {bubble.visibility === "PUBLIC" ? "Public" : "Private"}
-        </span>
+      <div className="flex items-start gap-3">
+        <div className="relative flex h-14 w-14 shrink-0 items-center justify-center overflow-hidden rounded-full bg-gradient-to-br from-sky-200 via-violet-200 to-rose-200 text-lg font-bold text-stone-700 shadow-inner">
+          <span className="absolute left-2 top-1.5 h-3.5 w-3.5 rounded-full bg-white/70 blur-[2px]" />
+          {initial}
+        </div>
+        <div className="min-w-0 flex-1 pt-1">
+          <h3 className="truncate font-semibold text-stone-900">{bubble.name}</h3>
+          <span
+            className={`mt-1 inline-block rounded-full px-2 py-0.5 text-xs ${
+              bubble.visibility === "PUBLIC"
+                ? "bg-emerald-100 text-emerald-800"
+                : "bg-stone-100 text-stone-600"
+            }`}
+          >
+            {bubble.visibility === "PUBLIC" ? "Public" : "Private"}
+          </span>
+        </div>
       </div>
       {bubble.description && (
-        <p className="mt-1 line-clamp-2 text-sm text-stone-600">{bubble.description}</p>
+        <p className="mt-3 line-clamp-2 text-sm text-stone-600">{bubble.description}</p>
       )}
       <p className="mt-2 text-xs text-stone-400">
         {bubble._count.memberships} member{bubble._count.memberships === 1 ? "" : "s"} ·{" "}
