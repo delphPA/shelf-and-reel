@@ -19,6 +19,7 @@ export function NameGate() {
           placeholder="e.g. Delphine"
           className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
           maxLength={40}
+          required
         />
       </div>
       <div>
