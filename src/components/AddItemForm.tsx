@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { BOOK_GENRES, MOVIE_GENRES, AGE_SECTIONS } from "@/lib/types";
 import { addRecommendationAction } from "@/app/actions";
+import { CharCountTextarea } from "@/components/CharCountTextarea";
 
 export function AddItemForm({ bubbleId }: { bubbleId: string }) {
   const [type, setType] = useState<"BOOK" | "MOVIE">("BOOK");
@@ -132,11 +133,11 @@ export function AddItemForm({ bubbleId }: { bubbleId: string }) {
         <label className="mb-1 block text-sm font-medium text-stone-700" htmlFor="description">
           What&rsquo;s it about? (optional)
         </label>
-        <textarea
+        <CharCountTextarea
           id="description"
           name="description"
-          rows={2}
-          maxLength={400}
+          rows={3}
+          maxLength={1000}
           className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
         />
       </div>

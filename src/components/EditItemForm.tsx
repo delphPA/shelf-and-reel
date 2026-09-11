@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { BOOK_GENRES, MOVIE_GENRES, AGE_SECTIONS } from "@/lib/types";
 import { updateItemAction } from "@/app/actions";
+import { CharCountTextarea } from "@/components/CharCountTextarea";
 
 function SaveButton({ onSettled }: { onSettled: () => void }) {
   const { pending } = useFormStatus();
@@ -160,12 +161,12 @@ export function EditItemForm({
         <label className="mb-1 block text-sm font-medium text-stone-700" htmlFor="edit-description">
           What&rsquo;s it about?
         </label>
-        <textarea
+        <CharCountTextarea
           id="edit-description"
           name="description"
           defaultValue={description ?? ""}
-          rows={2}
-          maxLength={400}
+          rows={3}
+          maxLength={1000}
           className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
         />
       </div>
