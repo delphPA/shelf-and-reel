@@ -5,6 +5,8 @@ import { getCurrentUser } from "@/lib/auth";
 import { Stars } from "@/components/Stars";
 import { ReviewForm } from "@/components/ReviewForm";
 import { EditItemForm } from "@/components/EditItemForm";
+import { DeleteItemButton } from "@/components/DeleteItemButton";
+import { CoverImage } from "@/components/CoverImage";
 import { ageSectionEmoji, ageSectionLabel, ageSectionBadgeClass } from "@/lib/types";
 
 export default async function ItemPage({
@@ -68,14 +70,11 @@ export default async function ItemPage({
 
       <div className="mt-3 flex gap-5">
         <div className="flex h-40 w-28 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-stone-100 text-4xl">
-          {item.coverUrl ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={item.coverUrl} alt="" className="h-full w-full object-cover" />
-          ) : item.type === "BOOK" ? (
-            "📖"
-          ) : (
-            "🎬"
-          )}
+          <CoverImage
+            src={item.coverUrl}
+            fallback={item.type === "BOOK" ? "📖" : "🎬"}
+            className="h-full w-full object-cover"
+          />
         </div>
         <div>
           <p className="text-xs uppercase tracking-wide text-stone-400">
@@ -99,16 +98,19 @@ export default async function ItemPage({
           {item.description && <p className="mt-3 text-sm text-stone-700">{item.description}</p>}
 
           {user && item.addedById === user.id && (
-            <EditItemForm
-              itemId={item.id}
-              type={item.type as "BOOK" | "MOVIE"}
-              title={item.title}
-              creator={item.creator}
-              genre={item.genre}
-              ageSection={item.ageSection}
-              description={item.description}
-              coverUrl={item.coverUrl}
-            />
+            <>
+              <EditItemForm
+                itemId={item.id}
+                type={item.type as "BOOK" | "MOVIE"}
+                title={item.title}
+                creator={item.creator}
+                genre={item.genre}
+                ageSection={item.ageSection}
+                description={item.description}
+                coverUrl={item.coverUrl}
+              />
+              <DeleteItemButton itemId={item.id} bubbleId={contextBubble?.id} />
+            </>
           )}
         </div>
       </div>

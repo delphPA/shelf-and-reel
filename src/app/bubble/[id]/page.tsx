@@ -4,6 +4,7 @@ import { prisma } from "@/lib/db";
 import { getCurrentUser } from "@/lib/auth";
 import { Stars } from "@/components/Stars";
 import { InviteBox } from "@/components/InviteBox";
+import { CoverImage } from "@/components/CoverImage";
 import { AGE_SECTIONS, ageSectionEmoji, ageSectionBadgeClass } from "@/lib/types";
 import type { Prisma } from "@prisma/client";
 
@@ -155,14 +156,11 @@ export default async function BubblePage({
               className="flex gap-3 rounded-lg border border-stone-200 bg-white p-3 hover:shadow-md transition-shadow"
             >
               <div className="flex h-20 w-14 shrink-0 items-center justify-center rounded bg-stone-100 text-2xl overflow-hidden">
-                {item.coverUrl ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={item.coverUrl} alt="" className="h-full w-full object-cover" />
-                ) : item.type === "BOOK" ? (
-                  "📖"
-                ) : (
-                  "🎬"
-                )}
+                <CoverImage
+                  src={item.coverUrl}
+                  fallback={item.type === "BOOK" ? "📖" : "🎬"}
+                  className="h-full w-full object-cover"
+                />
               </div>
               <div className="min-w-0 flex-1">
                 <p className="truncate font-medium">{item.title}</p>

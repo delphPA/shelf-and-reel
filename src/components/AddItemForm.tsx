@@ -101,16 +101,31 @@ export function AddItemForm({ bubbleId }: { bubbleId: string }) {
       </div>
 
       <div>
-        <label className="mb-1 block text-sm font-medium text-stone-700" htmlFor="coverUrl">
-          Cover image URL (optional)
+        <label className="mb-1 block text-sm font-medium text-stone-700" htmlFor="coverImage">
+          Cover image (optional)
         </label>
+        <input
+          id="coverImage"
+          name="coverImage"
+          type="file"
+          accept="image/*"
+          className="block w-full text-sm text-stone-700 file:mr-3 file:rounded-md file:border-0 file:bg-amber-800 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-amber-900"
+        />
+        <p className="mt-1 text-xs text-stone-500">
+          Upload a photo of the cover, or paste a direct image link below instead.
+        </p>
         <input
           id="coverUrl"
           name="coverUrl"
           type="url"
-          placeholder="https://..."
-          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+          placeholder="https://... (must link directly to an image, not a webpage)"
+          className="mt-2 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
         />
+        <p className="mt-1 text-xs text-stone-500">
+          Tip: right-click a picture online and choose &ldquo;Copy image address&rdquo; — a link to
+          a product page, Google Photos album, or article won&rsquo;t work here. Uploading is more
+          reliable.
+        </p>
       </div>
 
       <div>

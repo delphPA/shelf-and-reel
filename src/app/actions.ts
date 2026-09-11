@@ -2,13 +2,31 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import { put } from "@vercel/blob";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, requireUser, setSession, clearSession } from "@/lib/auth";
 import { generateInviteCode } from "@/lib/codes";
 
+const MAX_COVER_BYTES = 5 * 1024 * 1024;
+
 function str(formData: FormData, key: string) {
   const v = formData.get(key);
   return typeof v === "string" ? v.trim() : "";
+}
+
+async function resolveCoverUrl(formData: FormData): Promise<string | null> {
+  const file = formData.get("coverImage");
+  if (file instanceof File && file.size > 0) {
+    if (file.size > MAX_COVER_BYTES) {
+      throw new Error("That image is too large — please use one under 5MB.");
+    }
+    const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
+    const blob = await put(`covers/${crypto.randomUUID()}.${ext || "jpg"}`, file, {
+      access: "public",
+    });
+    return blob.url;
+  }
+  return str(formData, "coverUrl") || null;
 }
 
 async function getOrCreateUserFromForm(formData: FormData) {
@@ -83,11 +101,12 @@ export async function addRecommendationAction(formData: FormData) {
     ? str(formData, "ageSection")
     : "ADULT";
   const description = str(formData, "description") || null;
-  const coverUrl = str(formData, "coverUrl") || null;
   const rating = Math.min(5, Math.max(1, Number(formData.get("rating")) || 5));
   const text = str(formData, "text") || null;
 
   if (!title) throw new Error("A title is required.");
+
+  const coverUrl = await resolveCoverUrl(formData);
 
   const candidates = await prisma.item.findMany({ where: { type } });
   let item = candidates.find((c) => c.title.toLowerCase() === title.toLowerCase());
@@ -147,9 +166,10 @@ export async function updateItemAction(formData: FormData) {
     ? str(formData, "ageSection")
     : item.ageSection;
   const description = str(formData, "description") || null;
-  const coverUrl = str(formData, "coverUrl") || null;
 
   if (!title) throw new Error("A title is required.");
+
+  const coverUrl = await resolveCoverUrl(formData);
 
   await prisma.item.update({
     where: { id: itemId },
@@ -157,6 +177,29 @@ export async function updateItemAction(formData: FormData) {
   });
 
   revalidatePath(`/item/${itemId}`);
+}
+
+export async function deleteItemAction(formData: FormData) {
+  const user = await requireUser();
+  const itemId = str(formData, "itemId");
+  const bubbleId = str(formData, "bubbleId");
+
+  const item = await prisma.item.findUnique({ where: { id: itemId } });
+  if (!item) redirect(bubbleId ? `/bubble/${bubbleId}` : "/");
+  if (item.addedById !== user.id) {
+    throw new Error("Only the person who added this can delete it.");
+  }
+
+  await prisma.$transaction([
+    prisma.review.deleteMany({ where: { itemId } }),
+    prisma.item.delete({ where: { id: itemId } }),
+  ]);
+
+  if (bubbleId) {
+    revalidatePath(`/bubble/${bubbleId}`);
+    redirect(`/bubble/${bubbleId}`);
+  }
+  redirect("/");
 }
 
 export async function updateProfileAction(formData: FormData) {

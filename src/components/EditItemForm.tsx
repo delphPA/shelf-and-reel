@@ -1,8 +1,31 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useFormStatus } from "react-dom";
 import { BOOK_GENRES, MOVIE_GENRES, AGE_SECTIONS } from "@/lib/types";
 import { updateItemAction } from "@/app/actions";
+
+function SaveButton({ onSettled }: { onSettled: () => void }) {
+  const { pending } = useFormStatus();
+  const wasPending = useRef(false);
+
+  useEffect(() => {
+    if (wasPending.current && !pending) {
+      onSettled();
+    }
+    wasPending.current = pending;
+  }, [pending, onSettled]);
+
+  return (
+    <button
+      type="submit"
+      disabled={pending}
+      className="rounded-md bg-amber-800 px-4 py-2 text-sm font-medium text-white hover:bg-amber-900 disabled:opacity-60"
+    >
+      {pending ? "Saving…" : "Save changes"}
+    </button>
+  );
+}
 
 export function EditItemForm({
   itemId,
@@ -106,17 +129,32 @@ export function EditItemForm({
         </div>
       </div>
       <div>
-        <label className="mb-1 block text-sm font-medium text-stone-700" htmlFor="edit-cover">
-          Cover image URL
+        <label className="mb-1 block text-sm font-medium text-stone-700" htmlFor="edit-coverImage">
+          Cover image
         </label>
+        <input
+          id="edit-coverImage"
+          name="coverImage"
+          type="file"
+          accept="image/*"
+          className="block w-full text-sm text-stone-700 file:mr-3 file:rounded-md file:border-0 file:bg-amber-800 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-amber-900"
+        />
+        <p className="mt-1 text-xs text-stone-500">
+          Upload a new photo to replace the cover, or update the link below instead.
+        </p>
         <input
           id="edit-cover"
           name="coverUrl"
           type="url"
           defaultValue={coverUrl ?? ""}
-          placeholder="https://..."
-          className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+          placeholder="https://... (must link directly to an image, not a webpage)"
+          className="mt-2 w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
         />
+        <p className="mt-1 text-xs text-stone-500">
+          Tip: right-click a picture online and choose &ldquo;Copy image address&rdquo; — a link to
+          a product page, Google Photos album, or article won&rsquo;t work here. Uploading is more
+          reliable.
+        </p>
       </div>
       <div>
         <label className="mb-1 block text-sm font-medium text-stone-700" htmlFor="edit-description">
@@ -132,13 +170,7 @@ export function EditItemForm({
         />
       </div>
       <div className="flex gap-2">
-        <button
-          type="submit"
-          onClick={() => setOpen(false)}
-          className="rounded-md bg-amber-800 px-4 py-2 text-sm font-medium text-white hover:bg-amber-900"
-        >
-          Save changes
-        </button>
+        <SaveButton onSettled={() => setOpen(false)} />
         <button
           type="button"
           onClick={() => setOpen(false)}
