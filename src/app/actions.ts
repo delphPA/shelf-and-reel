@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { put } from "@vercel/blob";
+import { randomUUID } from "node:crypto";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, requireUser, setSession, clearSession } from "@/lib/auth";
 import { generateInviteCode } from "@/lib/codes";
@@ -21,7 +22,7 @@ async function resolveCoverUrl(formData: FormData): Promise<string | null> {
       throw new Error("That image is too large — please use one under 5MB.");
     }
     const ext = (file.name.split(".").pop() || "jpg").toLowerCase().replace(/[^a-z0-9]/g, "");
-    const blob = await put(`covers/${crypto.randomUUID()}.${ext || "jpg"}`, file, {
+    const blob = await put(`covers/${randomUUID()}.${ext || "jpg"}`, file, {
       access: "public",
     });
     return blob.url;
