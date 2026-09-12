@@ -19,6 +19,8 @@ model User {
   name        String
   avatarEmoji String   @default("🙂")
   loginToken  String   @unique @default(cuid())
+  googleId    String?  @unique
+  email       String?  @unique
   createdAt   DateTime @default(now())
 
   memberships  Membership[]

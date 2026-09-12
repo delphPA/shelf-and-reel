@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { put } from "@vercel/blob";
 import { randomUUID } from "node:crypto";
+import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, requireUser, setSession, clearSession } from "@/lib/auth";
 import { generateInviteCode } from "@/lib/codes";
@@ -209,10 +210,18 @@ export async function updateProfileAction(formData: FormData) {
   const user = await requireUser();
   const name = str(formData, "name");
   const avatarEmoji = str(formData, "avatarEmoji") || user.avatarEmoji;
+  const email = str(formData, "email") || null;
 
   if (!name) throw new Error("Name can't be empty.");
 
-  await prisma.user.update({ where: { id: user.id }, data: { name, avatarEmoji } });
+  try {
+    await prisma.user.update({ where: { id: user.id }, data: { name, avatarEmoji, email } });
+  } catch (err) {
+    if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+      throw new Error("That email is already used by another account.");
+    }
+    throw err;
+  }
   revalidatePath("/me");
 }
 

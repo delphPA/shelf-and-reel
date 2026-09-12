@@ -41,6 +41,26 @@ export default async function ProfilePage() {
           />
         </div>
         <div>
+          <label className="mb-1 block text-sm font-medium text-stone-700" htmlFor="email">
+            Email (optional)
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            defaultValue={user.email ?? ""}
+            maxLength={254}
+            placeholder="you@example.com"
+            className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+          />
+          {user.googleId && (
+            <p className="mt-1 text-xs text-stone-500">
+              This was set from your Google account — changing it here only updates what&rsquo;s
+              shown, it won&rsquo;t affect which Google account you sign in with.
+            </p>
+          )}
+        </div>
+        <div>
           <label className="mb-1 block text-sm font-medium text-stone-700">Avatar</label>
           <div className="flex flex-wrap gap-1">
             {AVATAR_EMOJIS.map((emoji) => (
