@@ -10,6 +10,7 @@ import { getCurrentUser, requireUser, setSession, clearSession } from "@/lib/aut
 import { generateInviteCode } from "@/lib/codes";
 import { sendNewRecommendationEmails } from "@/lib/email";
 import { getSiteUrl } from "@/lib/site-url";
+import { hashPassword, verifyPassword } from "@/lib/password";
 
 const MAX_COVER_BYTES = 5 * 1024 * 1024;
 
@@ -39,11 +40,28 @@ async function getOrCreateUserFromForm(formData: FormData) {
   if (!user) {
     const displayName = str(formData, "displayName");
     const avatarEmoji = str(formData, "avatarEmoji") || "🙂";
+    const email = str(formData, "signupEmail") || null;
+    const password = str(formData, "signupPassword");
+
     if (!displayName) {
       throw new Error("Please enter your name to continue.");
     }
+    if (email && password.length < 8) {
+      throw new Error("Password must be at least 8 characters.");
+    }
+    if (email) {
+      const existing = await prisma.user.findUnique({ where: { email } });
+      if (existing) {
+        throw new Error(
+          "That email already has an account here — sign in instead, then create or join from your profile."
+        );
+      }
+    }
+
+    const passwordHash = email && password ? await hashPassword(password) : null;
+
     user = await prisma.user.create({
-      data: { name: displayName, avatarEmoji },
+      data: { name: displayName, avatarEmoji, email, passwordHash },
     });
     await setSession(user.id);
     isNew = true;
@@ -267,6 +285,44 @@ export async function updateProfileAction(formData: FormData) {
     throw err;
   }
   revalidatePath("/me");
+}
+
+export async function setPasswordAction(formData: FormData) {
+  const user = await requireUser();
+  const newPassword = str(formData, "newPassword");
+  const currentPassword = str(formData, "currentPassword");
+
+  if (!user.email) {
+    throw new Error("Add an email to your profile first, then you can set a password.");
+  }
+  if (newPassword.length < 8) {
+    throw new Error("Password must be at least 8 characters.");
+  }
+  if (user.passwordHash) {
+    const ok = currentPassword && (await verifyPassword(currentPassword, user.passwordHash));
+    if (!ok) throw new Error("Your current password wasn't correct.");
+  }
+
+  const passwordHash = await hashPassword(newPassword);
+  await prisma.user.update({ where: { id: user.id }, data: { passwordHash } });
+  revalidatePath("/me");
+}
+
+export async function loginWithPasswordAction(formData: FormData) {
+  const email = str(formData, "email");
+  const password = str(formData, "password");
+
+  if (!email || !password) {
+    throw new Error("Please enter your email and password.");
+  }
+
+  const user = await prisma.user.findUnique({ where: { email } });
+  if (!user || !user.passwordHash || !(await verifyPassword(password, user.passwordHash))) {
+    throw new Error("That email and password don't match an account.");
+  }
+
+  await setSession(user.id);
+  redirect("/me");
 }
 
 export async function logoutAction() {

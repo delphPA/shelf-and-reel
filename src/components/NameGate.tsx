@@ -41,6 +41,40 @@ export function NameGate() {
           ))}
         </div>
       </div>
+
+      <details className="rounded-md border border-stone-200 bg-white p-3">
+        <summary className="cursor-pointer text-sm font-medium text-stone-700">
+          Prefer to sign in with an email and password instead of a link? (optional)
+        </summary>
+        <div className="mt-3 space-y-3">
+          <div>
+            <label className="mb-1 block text-sm font-medium text-stone-700" htmlFor="signupEmail">
+              Your email
+            </label>
+            <input
+              id="signupEmail"
+              name="signupEmail"
+              type="email"
+              placeholder="you@example.com"
+              maxLength={254}
+              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+            />
+          </div>
+          <div>
+            <label className="mb-1 block text-sm font-medium text-stone-700" htmlFor="signupPassword">
+              Choose a password
+            </label>
+            <input
+              id="signupPassword"
+              name="signupPassword"
+              type="password"
+              minLength={8}
+              placeholder="At least 8 characters"
+              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+            />
+          </div>
+        </div>
+      </details>
     </div>
   );
 }

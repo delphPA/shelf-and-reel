@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 import { getCurrentUser } from "@/lib/auth";
 import { prisma } from "@/lib/db";
-import { updateProfileAction } from "../actions";
+import { updateProfileAction, setPasswordAction } from "../actions";
 import { LoginLinkBox } from "@/components/LoginLinkBox";
 import { AVATAR_EMOJIS } from "@/lib/types";
 
@@ -53,12 +53,6 @@ export default async function ProfilePage() {
             placeholder="you@example.com"
             className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
           />
-          {user.googleId && (
-            <p className="mt-1 text-xs text-stone-500">
-              This was set from your Google account — changing it here only updates what&rsquo;s
-              shown, it won&rsquo;t affect which Google account you sign in with.
-            </p>
-          )}
         </div>
         <div>
           <label className="mb-1 block text-sm font-medium text-stone-700">Avatar</label>
@@ -84,6 +78,58 @@ export default async function ProfilePage() {
           className="rounded-md bg-amber-800 px-4 py-2 text-sm font-medium text-white hover:bg-amber-900"
         >
           Save
+        </button>
+      </form>
+
+      <form
+        action={setPasswordAction}
+        className="space-y-4 rounded-lg border border-stone-200 bg-white p-4"
+      >
+        <h2 className="font-semibold">{user.passwordHash ? "Change password" : "Set a password"}</h2>
+        <p className="text-sm text-stone-600">
+          {user.passwordHash
+            ? "Update your password for signing in with email."
+            : "Add a password so you can sign in with your email instead of a link."}
+        </p>
+        {!user.email && (
+          <p className="rounded-md bg-amber-50 px-3 py-2 text-sm text-amber-900">
+            Add an email above first — a password needs an email to go with it.
+          </p>
+        )}
+        {user.passwordHash && (
+          <div>
+            <label className="mb-1 block text-sm font-medium text-stone-700" htmlFor="currentPassword">
+              Current password
+            </label>
+            <input
+              id="currentPassword"
+              name="currentPassword"
+              type="password"
+              required
+              className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+            />
+          </div>
+        )}
+        <div>
+          <label className="mb-1 block text-sm font-medium text-stone-700" htmlFor="newPassword">
+            {user.passwordHash ? "New password" : "Password"}
+          </label>
+          <input
+            id="newPassword"
+            name="newPassword"
+            type="password"
+            minLength={8}
+            required
+            placeholder="At least 8 characters"
+            className="w-full rounded-md border border-stone-300 px-3 py-2 text-sm"
+          />
+        </div>
+        <button
+          type="submit"
+          disabled={!user.email}
+          className="rounded-md bg-amber-800 px-4 py-2 text-sm font-medium text-white hover:bg-amber-900 disabled:opacity-50"
+        >
+          {user.passwordHash ? "Update password" : "Set password"}
         </button>
       </form>
 
