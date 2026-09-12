@@ -5,6 +5,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { Stars } from "@/components/Stars";
 import { InviteBox } from "@/components/InviteBox";
 import { CoverImage } from "@/components/CoverImage";
+import { LoginLinkBox } from "@/components/LoginLinkBox";
 import { AGE_SECTIONS, ageSectionEmoji, ageSectionBadgeClass } from "@/lib/types";
 import type { Prisma } from "@prisma/client";
 
@@ -13,7 +14,7 @@ export default async function BubblePage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ type?: string; age?: string; genre?: string }>;
+  searchParams: Promise<{ type?: string; age?: string; genre?: string; welcome?: string }>;
 }) {
   const { id } = await params;
   const sp = await searchParams;
@@ -73,6 +74,16 @@ export default async function BubblePage({
 
   return (
     <div className="mx-auto max-w-5xl px-4 py-8">
+      {sp.welcome === "1" && user && (
+        <div className="mb-6">
+          <p className="mb-2 font-semibold text-amber-900">
+            🎉 Welcome, {user.name}! Before you go, save this so you can get back in from your
+            phone or any other device:
+          </p>
+          <LoginLinkBox token={user.loginToken} />
+        </div>
+      )}
+
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">

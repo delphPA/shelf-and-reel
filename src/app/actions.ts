@@ -32,6 +32,7 @@ async function resolveCoverUrl(formData: FormData): Promise<string | null> {
 
 async function getOrCreateUserFromForm(formData: FormData) {
   let user = await getCurrentUser();
+  let isNew = false;
   if (!user) {
     const displayName = str(formData, "displayName");
     const avatarEmoji = str(formData, "avatarEmoji") || "🙂";
@@ -42,8 +43,9 @@ async function getOrCreateUserFromForm(formData: FormData) {
       data: { name: displayName, avatarEmoji },
     });
     await setSession(user.id);
+    isNew = true;
   }
-  return user;
+  return { user, isNew };
 }
 
 export async function createBubbleAction(formData: FormData) {
@@ -53,7 +55,7 @@ export async function createBubbleAction(formData: FormData) {
 
   if (!name) throw new Error("Please give your bubble a name.");
 
-  const user = await getOrCreateUserFromForm(formData);
+  const { user, isNew } = await getOrCreateUserFromForm(formData);
 
   const bubble = await prisma.bubble.create({
     data: {
@@ -66,7 +68,7 @@ export async function createBubbleAction(formData: FormData) {
     },
   });
 
-  redirect(`/bubble/${bubble.id}`);
+  redirect(`/bubble/${bubble.id}${isNew ? "?welcome=1" : ""}`);
 }
 
 export async function joinBubbleAction(formData: FormData) {
@@ -74,7 +76,7 @@ export async function joinBubbleAction(formData: FormData) {
   const bubble = await prisma.bubble.findUnique({ where: { inviteCode } });
   if (!bubble) throw new Error("That invite link doesn't seem to be valid anymore.");
 
-  const user = await getOrCreateUserFromForm(formData);
+  const { user, isNew } = await getOrCreateUserFromForm(formData);
 
   await prisma.membership.upsert({
     where: { userId_bubbleId: { userId: user.id, bubbleId: bubble.id } },
@@ -82,7 +84,7 @@ export async function joinBubbleAction(formData: FormData) {
     create: { userId: user.id, bubbleId: bubble.id, role: "MEMBER" },
   });
 
-  redirect(`/bubble/${bubble.id}`);
+  redirect(`/bubble/${bubble.id}${isNew ? "?welcome=1" : ""}`);
 }
 
 export async function addRecommendationAction(formData: FormData) {

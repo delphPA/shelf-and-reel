@@ -51,9 +51,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
                   </form>
                 </>
               ) : (
-                <Link href="/create-bubble" className="rounded-md bg-amber-800 px-3 py-1.5 text-white hover:bg-amber-900">
-                  Get started
-                </Link>
+                <>
+                  <Link href="/login" className="text-stone-600 hover:text-stone-900 hover:underline">
+                    Sign in
+                  </Link>
+                  <Link href="/create-bubble" className="rounded-md bg-amber-800 px-3 py-1.5 text-white hover:bg-amber-900">
+                    Get started
+                  </Link>
+                </>
               )}
             </nav>
           </div>
