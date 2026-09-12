@@ -2,8 +2,13 @@ import { getCurrentUser } from "@/lib/auth";
 import { createBubbleAction } from "../actions";
 import { NameGate } from "@/components/NameGate";
 
-export default async function CreateBubblePage() {
+export default async function CreateBubblePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
   const user = await getCurrentUser();
+  const { error } = await searchParams;
 
   return (
     <div className="mx-auto max-w-lg px-4 py-10">
@@ -12,6 +17,10 @@ export default async function CreateBubblePage() {
         A bubble is your circle of friends or family. You decide who joins by sharing an invite
         link, and whether the bubble is visible to everyone or just your people.
       </p>
+
+      {error && (
+        <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+      )}
 
       <form action={createBubbleAction} className="mt-6 space-y-5">
         <div>

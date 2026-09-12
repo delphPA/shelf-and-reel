@@ -6,10 +6,13 @@ import { joinBubbleAction } from "../../actions";
 
 export default async function JoinPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ code: string }>;
+  searchParams: Promise<{ error?: string }>;
 }) {
   const { code } = await params;
+  const { error } = await searchParams;
   const bubble = await prisma.bubble.findUnique({
     where: { inviteCode: code },
     select: { id: true, name: true, description: true, visibility: true },
@@ -29,6 +32,10 @@ export default async function JoinPage({
       <p className="text-sm text-stone-500">You&rsquo;ve been invited to join</p>
       <h1 className="text-2xl font-bold">{bubble.name}</h1>
       {bubble.description && <p className="mt-1 text-stone-600">{bubble.description}</p>}
+
+      {error && (
+        <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
+      )}
 
       {alreadyMember ? (
         <div className="mt-6 rounded-md border border-stone-200 bg-white p-4 text-sm">

@@ -1,9 +1,20 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { Suspense, useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import { loginWithPasswordAction } from "../actions";
 
 export default function LoginPage() {
+  return (
+    <Suspense fallback={null}>
+      <LoginPageInner />
+    </Suspense>
+  );
+}
+
+function LoginPageInner() {
+  const searchParams = useSearchParams();
+  const loginError = searchParams.get("error");
   const [value, setValue] = useState("");
   const [error, setError] = useState("");
 
@@ -33,6 +44,10 @@ export default function LoginPage() {
       <p className="mt-1 text-sm text-stone-600">
         Use your email and password if you set one, or paste your personal sign-in link below.
       </p>
+
+      {loginError && (
+        <p className="mt-4 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{loginError}</p>
+      )}
 
       <form action={loginWithPasswordAction} className="mt-6 space-y-3">
         <div>

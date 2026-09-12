@@ -14,10 +14,10 @@ export default async function ItemPage({
   searchParams,
 }: {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ bubble?: string }>;
+  searchParams: Promise<{ bubble?: string; error?: string }>;
 }) {
   const { id } = await params;
-  const { bubble: bubbleId } = await searchParams;
+  const { bubble: bubbleId, error } = await searchParams;
 
   const item = await prisma.item.findUnique({ where: { id } });
   if (!item) notFound();
@@ -66,6 +66,10 @@ export default async function ItemPage({
         <Link href={`/bubble/${contextBubble.id}`} className="text-sm text-stone-500 hover:underline">
           ← Back to {contextBubble.name}
         </Link>
+      )}
+
+      {error && (
+        <p className="mt-3 rounded-md bg-red-50 px-3 py-2 text-sm text-red-700">{error}</p>
       )}
 
       <div className="mt-3 flex gap-5 rounded-lg border border-stone-200 bg-white p-5">

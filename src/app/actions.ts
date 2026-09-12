@@ -34,7 +34,12 @@ async function resolveCoverUrl(formData: FormData): Promise<string | null> {
   return str(formData, "coverUrl") || null;
 }
 
-async function getOrCreateUserFromForm(formData: FormData) {
+// Server Actions that also call redirect() elsewhere in the same function
+// have been observed to lose a thrown Error's message in production (only
+// the generic digest reaches the client, even though the real message shows
+// up in server logs) -- so validation failures here redirect back to the
+// given page with the message in a query param instead of throwing.
+async function getOrCreateUserFromForm(formData: FormData, backPath: string) {
   let user = await getCurrentUser();
   let isNew = false;
   if (!user) {
@@ -44,16 +49,18 @@ async function getOrCreateUserFromForm(formData: FormData) {
     const password = str(formData, "signupPassword");
 
     if (!displayName) {
-      throw new Error("Please enter your name to continue.");
+      redirect(`${backPath}?error=${encodeURIComponent("Please enter your name to continue.")}`);
     }
     if (email && password.length < 8) {
-      throw new Error("Password must be at least 8 characters.");
+      redirect(`${backPath}?error=${encodeURIComponent("Password must be at least 8 characters.")}`);
     }
     if (email) {
       const existing = await prisma.user.findUnique({ where: { email } });
       if (existing) {
-        throw new Error(
-          "That email already has an account here — sign in instead, then create or join from your profile."
+        redirect(
+          `${backPath}?error=${encodeURIComponent(
+            "That email already has an account here — sign in instead, then create or join from your profile."
+          )}`
         );
       }
     }
@@ -74,9 +81,11 @@ export async function createBubbleAction(formData: FormData) {
   const description = str(formData, "description") || null;
   const visibility = formData.get("visibility") === "PUBLIC" ? "PUBLIC" : "PRIVATE";
 
-  if (!name) throw new Error("Please give your bubble a name.");
+  if (!name) {
+    redirect(`/create-bubble?error=${encodeURIComponent("Please give your bubble a name.")}`);
+  }
 
-  const { user, isNew } = await getOrCreateUserFromForm(formData);
+  const { user, isNew } = await getOrCreateUserFromForm(formData, "/create-bubble");
 
   const bubble = await prisma.bubble.create({
     data: {
@@ -95,9 +104,9 @@ export async function createBubbleAction(formData: FormData) {
 export async function joinBubbleAction(formData: FormData) {
   const inviteCode = str(formData, "inviteCode");
   const bubble = await prisma.bubble.findUnique({ where: { inviteCode } });
-  if (!bubble) throw new Error("That invite link doesn't seem to be valid anymore.");
+  if (!bubble) redirect(`/join/${inviteCode}`);
 
-  const { user, isNew } = await getOrCreateUserFromForm(formData);
+  const { user, isNew } = await getOrCreateUserFromForm(formData, `/join/${inviteCode}`);
 
   await prisma.membership.upsert({
     where: { userId_bubbleId: { userId: user.id, bubbleId: bubble.id } },
@@ -240,7 +249,12 @@ export async function deleteItemAction(formData: FormData) {
   const item = await prisma.item.findUnique({ where: { id: itemId } });
   if (!item) redirect(bubbleId ? `/bubble/${bubbleId}` : "/");
   if (item.addedById !== user.id) {
-    throw new Error("Only the person who added this can delete it.");
+    const backUrl = `/item/${itemId}${bubbleId ? `?bubble=${bubbleId}` : ""}`;
+    redirect(
+      `${backUrl}${bubbleId ? "&" : "?"}error=${encodeURIComponent(
+        "Only the person who added this can delete it."
+      )}`
+    );
   }
 
   await prisma.$transaction([
@@ -313,12 +327,12 @@ export async function loginWithPasswordAction(formData: FormData) {
   const password = str(formData, "password");
 
   if (!email || !password) {
-    throw new Error("Please enter your email and password.");
+    redirect(`/login?error=${encodeURIComponent("Please enter your email and password.")}`);
   }
 
   const user = await prisma.user.findUnique({ where: { email } });
   if (!user || !user.passwordHash || !(await verifyPassword(password, user.passwordHash))) {
-    throw new Error("That email and password don't match an account.");
+    redirect(`/login?error=${encodeURIComponent("That email and password don't match an account.")}`);
   }
 
   await setSession(user.id);
