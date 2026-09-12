@@ -44,11 +44,12 @@ model Bubble {
 }
 
 model Membership {
-  id       String   @id @default(cuid())
-  userId   String
-  bubbleId String
-  role     String   @default("MEMBER")
-  joinedAt DateTime @default(now())
+  id              String   @id @default(cuid())
+  userId          String
+  bubbleId        String
+  role            String   @default("MEMBER")
+  notifyOnNewItem Boolean  @default(true)
+  joinedAt        DateTime @default(now())
 
   user   User   @relation(fields: [userId], references: [id])
   bubble Bubble @relation(fields: [bubbleId], references: [id])

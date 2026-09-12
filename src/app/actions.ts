@@ -8,6 +8,8 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/db";
 import { getCurrentUser, requireUser, setSession, clearSession } from "@/lib/auth";
 import { generateInviteCode } from "@/lib/codes";
+import { sendNewRecommendationEmails } from "@/lib/email";
+import { getSiteUrl } from "@/lib/site-url";
 
 const MAX_COVER_BYTES = 5 * 1024 * 1024;
 
@@ -121,11 +123,40 @@ export async function addRecommendationAction(formData: FormData) {
     });
   }
 
+  const existingReview = await prisma.review.findUnique({
+    where: { itemId_userId_bubbleId: { itemId: item.id, userId: user.id, bubbleId } },
+  });
+
   await prisma.review.upsert({
     where: { itemId_userId_bubbleId: { itemId: item.id, userId: user.id, bubbleId } },
     update: { rating, text },
     create: { itemId: item.id, userId: user.id, bubbleId, rating, text },
   });
+
+  if (!existingReview) {
+    const notifyMembers = await prisma.membership.findMany({
+      where: { bubbleId, userId: { not: user.id }, notifyOnNewItem: true },
+      include: { user: { select: { email: true } } },
+    });
+    const recipients = notifyMembers
+      .map((m) => m.user.email)
+      .filter((email): email is string => Boolean(email));
+
+    if (recipients.length > 0) {
+      const bubbleForEmail = await prisma.bubble.findUnique({
+        where: { id: bubbleId },
+        select: { name: true },
+      });
+      await sendNewRecommendationEmails({
+        recipients,
+        actorName: user.name,
+        bubbleName: bubbleForEmail?.name ?? "your bubble",
+        itemTitle: item.title,
+        itemType: item.type as "BOOK" | "MOVIE",
+        itemUrl: `${getSiteUrl()}/item/${item.id}?bubble=${bubbleId}`,
+      });
+    }
+  }
 
   revalidatePath(`/bubble/${bubbleId}`);
   redirect(`/item/${item.id}?bubble=${bubbleId}`);
@@ -204,6 +235,19 @@ export async function deleteItemAction(formData: FormData) {
     redirect(`/bubble/${bubbleId}`);
   }
   redirect("/");
+}
+
+export async function updateNotificationPrefAction(formData: FormData) {
+  const user = await requireUser();
+  const bubbleId = str(formData, "bubbleId");
+  const notify = formData.get("notify") === "on";
+
+  await prisma.membership.update({
+    where: { userId_bubbleId: { userId: user.id, bubbleId } },
+    data: { notifyOnNewItem: notify },
+  });
+
+  revalidatePath(`/bubble/${bubbleId}`);
 }
 
 export async function updateProfileAction(formData: FormData) {

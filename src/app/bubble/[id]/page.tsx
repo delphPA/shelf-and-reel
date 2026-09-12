@@ -6,6 +6,7 @@ import { Stars } from "@/components/Stars";
 import { InviteBox } from "@/components/InviteBox";
 import { CoverImage } from "@/components/CoverImage";
 import { LoginLinkBox } from "@/components/LoginLinkBox";
+import { NotifyToggle } from "@/components/NotifyToggle";
 import { AGE_SECTIONS, ageSectionEmoji, ageSectionBadgeClass } from "@/lib/types";
 import type { Prisma } from "@prisma/client";
 
@@ -84,10 +85,10 @@ export default async function BubblePage({
         </div>
       )}
 
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-wrap items-start justify-between gap-4 rounded-lg border border-stone-200 bg-white p-5">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-2xl font-bold">{bubble.name}</h1>
+            <h1 className="text-2xl font-bold text-stone-900">{bubble.name}</h1>
             <span
               className={`rounded-full px-2 py-0.5 text-xs ${
                 bubble.visibility === "PUBLIC"
@@ -98,7 +99,16 @@ export default async function BubblePage({
               {bubble.visibility === "PUBLIC" ? "Public" : "Private"}
             </span>
           </div>
-          {bubble.description && <p className="mt-1 text-stone-600">{bubble.description}</p>}
+          {bubble.description && <p className="mt-1 text-stone-700">{bubble.description}</p>}
+          {isMember && membership && user && (
+            <div className="mt-3">
+              <NotifyToggle
+                bubbleId={bubble.id}
+                initialValue={membership.notifyOnNewItem}
+                hasEmail={Boolean(user.email)}
+              />
+            </div>
+          )}
         </div>
         {isMember && (
           <Link

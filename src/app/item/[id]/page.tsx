@@ -68,7 +68,7 @@ export default async function ItemPage({
         </Link>
       )}
 
-      <div className="mt-3 flex gap-5">
+      <div className="mt-3 flex gap-5 rounded-lg border border-stone-200 bg-white p-5">
         <div className="flex h-40 w-28 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-stone-100 text-4xl">
           <CoverImage
             src={item.coverUrl}
@@ -77,25 +77,25 @@ export default async function ItemPage({
           />
         </div>
         <div>
-          <p className="text-xs uppercase tracking-wide text-stone-400">
+          <p className="text-xs uppercase tracking-wide text-stone-500">
             {item.type === "BOOK" ? "Book" : "Movie"}
           </p>
-          <h1 className="text-2xl font-bold">{item.title}</h1>
-          {item.creator && <p className="text-stone-600">{item.creator}</p>}
+          <h1 className="text-2xl font-bold text-stone-900">{item.title}</h1>
+          {item.creator && <p className="text-stone-700">{item.creator}</p>}
           <div className="mt-2 flex items-center gap-2 text-sm">
             <span className={`rounded-full px-2 py-0.5 text-xs ${ageSectionBadgeClass(item.ageSection)}`}>
               {ageSectionEmoji(item.ageSection)} {ageSectionLabel(item.ageSection)}
             </span>
             <span className="text-stone-400">·</span>
-            <span className="text-stone-500">{item.genre}</span>
+            <span className="text-stone-600">{item.genre}</span>
           </div>
           <div className="mt-2 flex items-center gap-2">
             <Stars rating={avg} size="text-lg" />
-            <span className="text-sm text-stone-400">
+            <span className="text-sm text-stone-500">
               {visibleReviews.length} review{visibleReviews.length === 1 ? "" : "s"}
             </span>
           </div>
-          {item.description && <p className="mt-3 text-sm text-stone-700">{item.description}</p>}
+          {item.description && <p className="mt-3 text-sm text-stone-800">{item.description}</p>}
 
           {user && item.addedById === user.id && (
             <>
@@ -145,7 +145,7 @@ export default async function ItemPage({
                 </div>
                 <Stars rating={r.rating} />
               </div>
-              {r.text && <p className="mt-2 text-sm text-stone-700">{r.text}</p>}
+              {r.text && <p className="mt-2 text-sm text-stone-800">{r.text}</p>}
             </li>
           ))}
         </ul>
